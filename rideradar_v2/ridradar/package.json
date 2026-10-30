@@ -1,0 +1,20 @@
+{
+  "name": "rideradar",
+  "version": "1.0.0",
+  "description": "RideRadar real-time transit tracker",
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"cyan,magenta\" \"node backend/index.js\" \"npm.cmd run dev --prefix frontend\"",
+    "dev:mock": "concurrently -n \"backend,frontend\" -c \"cyan,magenta\" \"node backend/index.js --mock\" \"npm.cmd run dev --prefix frontend\"",
+    "mock": "npm.cmd run dev:mock",
+    "start": "npm.cmd run dev",
+    "backend": "node backend/index.js",
+    "backend:mock": "node backend/index.js --mock",
+    "frontend": "npm.cmd run dev --prefix frontend"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideRadar — Real-Time BRTS Tracking</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600&family=Space+Mono&display=swap"
+        rel="stylesheet">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">RIDE<span class="teal">RADAR</span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#tech">Tech Stack</a></li>
+                <li><a href="#roadmap">Roadmap</a></li>
+                <li><a href="#" class="btn-primary">View Poster</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="reveal-text">Transforming Public <span class="teal">Transit</span></h1>
+            <p class="hero-subtitle">Real-time GPS tracking for Surat BRTS Sitilink Network. 5-second updates, 95k daily
+                riders, zero uncertainty.</p>
+            <div class="hero-actions">
+                <a href="#problem" class="btn-primary">Research Findings</a>
+                <a href="#demo" class="btn-secondary">Live Demo</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img src="../../research/website/assets/hero_visual.png" alt="RideRadar Visualization" class="hero-img">
+        </div>
+    </section>
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-num">3L+</span>
+            <span class="stat-label">Daily Commuters</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">57+</span>
+            <span class="stat-label">BRTS Routes</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">±28s</span>
+            <span class="stat-label">ETA Accuracy</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">0</span>
+            <span class="stat-label">Daily Uncertainty</span>
+        </div>
+    </div>
+    <!-- Problem Section -->
+    <section id="problem" class="section problem">
+        <div class="container">
+            <h2 class="sec-title">The <span class="coral">Problem</span></h2>
+            <div class="grid-2">
+                <div class="problem-text">
+                    <p class="body-lg">Despite being the backbone of Surat's mobility, the BRTS Sitilink network
+                        operates with zero real-time visibility for passengers.</p>
+                    <ul class="bullet-list">
+                        <li>87% of passengers face uncertain waits</li>
+                        <li>72% lack any schedule information</li>
+                        <li>58% have missed buses due to unknown delays</li>
+                        <li>44% switch to auto-rickshaws out of frustration</li>
+                    </ul>
+                </div>
+                <div class="problem-visual">
+                    <div class="glass-card">
+                        <canvas id="problemChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Solution Section (Map Demo) -->
+    <section id="demo" class="section solution">
+        <div class="container">
+            <h2 class="sec-title">The <span class="teal">Solution</span></h2>
+            <div class="demo-wrapper glass-card">
+                <div class="demo-header">
+                    <div class="live-indicator"><span class="dot pulse"></span> LIVE TRACKING SIMULATION</div>
+                    <div class="bus-info">SVNIT Campus Shuttle: Academic Loop</div>
+                </div>
+                <div id="map-demo" class="map-container">
+                    <!-- Map mockup will be rendered here by JS -->
+                </div>
+                <div class="demo-footer">
+                    <div class="demo-stat">ETA: <span class="teal">4 mins</span></div>
+                    <div class="demo-stat">Stops ahead: <span class="teal">3</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Tech Stack Section -->
+    <section id="tech" class="section tech">
+        <div class="container">
+            <h2 class="sec-title">Built with <span class="lime">Open-Source</span></h2>
+            <div class="tech-grid">
+                <div class="tech-card glass-card">
+                    <div class="icon">📡</div>
+                    <h3>Hardware</h3>
+                    <p>LilyGO T-SIM7000G GPS modules. Low-cost, cellular-enabled, and high-precision.</p>
+                </div>
+                <div class="tech-card glass-card">
+                    <div class="icon">☁️</div>
+                    <h3>Backend</h3>
+                    <p>Node.js & Socket.io for real-time WebSocket communication and MQTT data ingestion.</p>
+                </div>
+                <div class="tech-card glass-card">
+                    <div class="icon">🗺️</div>
+                    <h3>Mapping</h3>
+                    <p>Leaflet.js + OpenStreetMap. Eliminating costly API fees while maintaining performance.</p>
+                </div>
+                <div class="tech-card glass-card">
+                    <div class="icon">📱</div>
+                    <h3>Client</h3>
+                    <p>Flutter mobile application and QR-code enabled web lite for instant access.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Roadmap -->
+    <section id="roadmap" class="section roadmap">
+        <div class="container">
+            <h2 class="sec-title">Project <span class="steel">Roadmap</span></h2>
+            <div class="timeline">
+                <div class="timeline-item active">
+                    <div class="time">Phase 1</div>
+                    <h3>SVNIT Campus Pilot</h3>
+                    <p>Validation with 3 buses and 500 initial users.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">Phase 2</div>
+                    <h3>SMC Partnership</h3>
+                    <p>Route 11 & 12 pilot with 10 buses and QR deployment.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">Phase 3</div>
+                    <h3>City-Wide Rollout</h3>
+                    <p>All 57+ routes and 200+ buses across Surat.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">Phase 4</div>
+                    <h3>Expansion</h3>
+                    <p>Multi-city deployment across Gujarat and beyond.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="glass-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <span class="logo-text">RIDE<span class="teal">RADAR</span></span>
+                    <p>A research project by VNSGU & SVNIT, Surat.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Team</a>
+                    <a href="#">Data Policy</a>
+                    <a href="#">SMC Sitilink</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 RideRadar Research Project. All rights reserved.
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
