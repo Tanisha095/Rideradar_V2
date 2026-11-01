@@ -147,12 +147,10 @@ bool connectNetwork() {
 
   // Configure SSL
   Serial.println("Configuring SSL...");
-  sendAT("AT+CSSLCFG=\"sslversion\",0,3",
-    1000);
-  sendAT("AT+CSSLCFG=\"ignorertctime\",0,1",
-    1000);
-  sendAT("AT+CSSLCFG=\"ctxindex\",0", 1000);
-  Serial.println("SSL configured");
+  sendAT("AT+CSSLCFG=\"sslversion\",0,4", 1000);
+  sendAT("AT+CSSLCFG=\"authmode\",0,0", 1000);
+  sendAT("AT+CSSLCFG=\"ignorertctime\",0,1", 1000);
+  sendAT("AT+CSSLCFG=\"enableSNI\",0,1", 1000);
 
   return true;
 }
@@ -160,85 +158,72 @@ bool connectNetwork() {
 // ─────────────────────────────────────────────────
 // Send GPS data to Supabase
 // ─────────────────────────────────────────────────
-bool sendToSupabase() {
 
+String lastReply = "";
+
+bool waitFor(const char* target, unsigned long timeoutMs) {
+  lastReply = "";
+  unsigned long start = millis();
+  while (millis() - start < timeoutMs) {
+    while (modem.available()) {
+      char c = modem.read();
+      Serial.write(c);
+      lastReply += c;
+    }
+    if (lastReply.indexOf(target) >= 0) return true;
+    if (lastReply.indexOf("ERROR") >= 0) return false;
+    delay(10);
+  }
+  return false;
+}
+
+bool sendToSupabase() {
   String body = "{";
-  body += "\"id\":\"" +
-    String(DEVICE_ID) + "\",";
-  body += "\"lat\":" +
-    String(gpsLat, 6) + ",";
-  body += "\"lng\":" +
-    String(gpsLng, 6) + ",";
-  body += "\"speed\":" +
-    String(gpsSpeed, 1) + ",";
-  body += "\"satellites\":" +
-    String(gpsSats);
+  body += "\"id\":\"" + String(DEVICE_ID) + "\",";
+  body += "\"lat\":" + String(gpsLat, 6) + ",";
+  body += "\"lng\":" + String(gpsLng, 6) + ",";
+  body += "\"speed\":" + String(gpsSpeed, 1) + ",";
+  body += "\"satellites\":" + String(gpsSats);
   body += "}";
 
   Serial.println("\n=== Sending to Supabase ===");
   Serial.println(body);
 
-  // Close previous session
-  sendAT("AT+HTTPTERM", 1000);
-  delay(1000);
+  sendAT("AT+HTTPTERM", 500);
 
-  // Init HTTP
-  String init = sendAT("AT+HTTPINIT", 2000);
-  if (init.indexOf("OK") < 0) {
-    Serial.println("HTTP init failed");
-    return false;
-  }
+  modem.println("AT+HTTPINIT");
+  if (!waitFor("OK", 3000)) { Serial.println("HTTPINIT failed"); return false; }
 
-  // Enable SSL
-  sendAT("AT+HTTPPARA=\"CID\",1", 1000);
-  sendAT("AT+HTTPPARA=\"SSLCFGID\",0", 1000);
+  sendAT("AT+HTTPPARA=\"CID\",1", 500);
+  sendAT("AT+HTTPPARA=\"SSLCFG\",0", 500);
 
-  // Set URL
-  sendAT("AT+HTTPPARA=\"URL\","
-    "\"https://" +
-    String(SUPABASE_HOST) +
-    "/rest/v1/buses\"", 2000);
+  // PUT with ?id=eq.<id> makes Supabase insert-or-update one row
+  sendAT("AT+HTTPPARA=\"URL\",\"https://" + String(SUPABASE_HOST) +
+         "/rest/v1/buses?id=eq." + String(DEVICE_ID) + "\"", 1000);
+  sendAT("AT+HTTPPARA=\"CONTENT\",\"application/json\"", 500);
+  sendAT("AT+HTTPPARA=\"USERDATA\",\"apikey: " + String(SUPABASE_KEY) + "\"", 1000);
 
-  // Content type
-  sendAT("AT+HTTPPARA=\"CONTENT\","
-    "\"application/json\"", 1000);
-
-  // API key header
-  String key = String(SUPABASE_KEY);
-  sendAT("AT+HTTPPARA=\"USERDATA\","
-    "\"apikey:" + key + "\"", 3000);
-
-  // Send body
-  modem.println("AT+HTTPDATA=" +
-    String(body.length()) + ",10000");
-  delay(2000);
+  modem.println("AT+HTTPDATA=" + String(body.length()) + ",10000");
+  if (!waitFor("DOWNLOAD", 5000)) { Serial.println("No DOWNLOAD prompt"); return false; }
   modem.print(body);
-  delay(3000);
+  if (!waitFor("OK", 5000)) { Serial.println("Body not accepted"); return false; }
 
-  // POST request
-  String result = sendAT(
-    "AT+HTTPACTION=1", 30000);
-  Serial.println("HTTP Result: " + result);
+  modem.println("AT+HTTPACTION=4");   // 4 = PUT
+  waitFor("+HTTPACTION:", 40000);
+  String result = lastReply;
+  Serial.println("\nHTTP Result: " + result);
 
-  String response = sendAT(
-    "AT+HTTPREAD", 5000);
-  Serial.println("Response: " + response);
+  sendAT("AT+HTTPTERM", 500);
 
-  sendAT("AT+HTTPTERM", 1000);
-
-  if (result.indexOf(",201,") > 0 ||
-      result.indexOf(",200,") > 0) {
+  if (result.indexOf(",200,") >= 0 || result.indexOf(",201,") >= 0 ||
+      result.indexOf(",204,") >= 0) {
     Serial.println("Supabase updated!");
-    Serial.println("LAT: " +
-      String(gpsLat, 6));
-    Serial.println("LNG: " +
-      String(gpsLng, 6));
     return true;
   }
-
-  Serial.println("Failed: " + result);
+  Serial.println("Send failed");
   return false;
 }
+
 
 // ─────────────────────────────────────────────────
 void setup() {
